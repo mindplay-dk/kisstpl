@@ -1,0 +1,23 @@
+{
+    "name": "mindplay/kisstpl",
+    "type": "library",
+    "description": "View service / template engine for plain PHP templates",
+    "license": "LGPL-3.0+",
+    "authors": [
+        {
+            "name": "Rasmus Schultz",
+            "email": "rasmus@mindplay.dk"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "require-dev": {
+        "phpunit/php-code-coverage": "3.0.*@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "mindplay\\kisstpl\\": "src/"
+        }
+    }
+}
