@@ -22,7 +22,7 @@ interface Renderer
      *
      * @see capture()
      */
-    function render($view, $type = null);
+    public function render($view, $type = null);
 
     /**
      * Render and capture the output from a PHP template for the given view - as
