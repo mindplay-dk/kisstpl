@@ -4,9 +4,7 @@ use mindplay\kisstpl\ViewService;
 
 $root = dirname(__DIR__);
 
-/** @var \Composer\Autoload\ClassLoader $autoloader */
-$autoloader = require $root . '/vendor/autoload.php';
-$autoloader->addPsr4('mindplay\kisstpl\\', $root . '/src');
+require $root . '/vendor/autoload.php';
 
 require __DIR__ . '/MockLayout.php';
 require __DIR__ . '/MockViewModel.php';
