@@ -44,6 +44,21 @@ use app\view\HelloWorld;
 /**
  * @var HelloWorld $view
  */
+
+?>
+...
+```
+
+Alternatively, for type-safe template rendering, you can also type-hint
+statically, by returning a closure:
+
+```PHP
+use app\view\HelloWorld;
+use mindplay\kisstpl\Renderer;
+
+<?php return function(HelloWorld $view, Renderer $renderer) { ?>
+...
+<?php }
 ```
 
 Things like layouts can be accomplished by using plain OOP composition.

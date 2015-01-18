@@ -23,7 +23,7 @@ if (coverage()) {
 }
 
 test(
-    'Can render view',
+    'Can render views',
     function () {
         $service = new ViewService(__DIR__);
         $view = new MockViewModel();
@@ -39,6 +39,12 @@ test(
         $content = $service->capture($view);
 
         eq($content, MockViewModel::EXPECTED_VALUE, 'template content was captured');
+
+        unset($content);
+
+        $content = $service->capture($view, 'closure');
+
+        eq($content, MockViewModel::EXPECTED_VALUE, 'template content from a closure was captured');
     }
 );
 

@@ -2,6 +2,7 @@
 
 namespace mindplay\kisstpl;
 
+use Closure;
 use RuntimeException;
 
 /**
@@ -35,6 +36,11 @@ class ViewService implements Renderer
     protected $capture_stack = array();
 
     /**
+     * @var Closure[] map where view-model class name => cached view closure
+     */
+    private $cache = array();
+
+    /**
      * @param string      $root_path absolute path to view root-folder
      * @param string|null $namespace optional; base namespace for view-models supported by this factory
      */
@@ -63,20 +69,36 @@ class ViewService implements Renderer
      */
     public function render($view, $type = null)
     {
-        if ($type === null) {
-            $type = $this->default_type;
-        }
-
-        $___path = $this->findTemplate($view, $type);
+        $__type = $type === null
+            ? $this->default_type
+            : $type;
 
         unset($type);
 
-        $___depth = count($this->capture_stack);
+        $__path = $this->findTemplate($view, $__type);
 
-        require $___path;
+        $__depth = count($this->capture_stack);
 
-        if (count($this->capture_stack) !== $___depth) {
-            throw new RuntimeException('begin() without matching end() in file: ' . $___path);
+        $__class = get_class($view);
+
+        if (isset($this->cache[$__class][$__type])) {
+            // invoke closure cached during previous call:
+
+            call_user_func($this->cache[$__class][$__type], $view, $this);
+        } else {
+            $__closure = require $__path;
+
+            if (is_callable($__closure)) {
+                // inject closure into cache and invoke:
+
+                $this->cache[$__class][$__type] = $__closure;
+
+                call_user_func($__closure, $view, $this);
+            }
+        }
+
+        if (count($this->capture_stack) !== $__depth) {
+            throw new RuntimeException('begin() without matching end() in file: ' . $__path);
         }
     }
 
