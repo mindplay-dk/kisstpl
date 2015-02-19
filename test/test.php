@@ -1,5 +1,6 @@
 <?php
 
+use mindplay\kisstpl\NamespaceViewFinder;
 use mindplay\kisstpl\ViewService;
 
 require __DIR__ . '/header.php';
@@ -19,7 +20,7 @@ if (coverage()) {
 test(
     'Can render views',
     function () {
-        $service = new ViewService(__DIR__);
+        $service = new ViewService(new NamespaceViewFinder(__DIR__));
         $view = new MockViewModel();
 
         ob_start();
@@ -43,32 +44,43 @@ test(
 );
 
 test(
-    'Can find view templates',
+    'Can find view templates (NamespaceViewFinder)',
     function () {
         $ROOT_PATH = 'foo/bar';
         $TYPE = 'baz';
 
-        $service = new ViewService($ROOT_PATH);
+        $finder = new NamespaceViewFinder($ROOT_PATH);
 
         $view = new \test\MockNamespacedViewModel();
 
         eq(
-            invoke($service, 'findTemplate', array($view, $TYPE)),
+            $finder->findTemplate($view, $TYPE),
             $ROOT_PATH . DIRECTORY_SEPARATOR
             . 'test/MockNamespacedViewModel'
             . '.' . $TYPE . '.php',
             'correctly resolves path to namespaced view-model'
         );
 
-        $service = new ViewService($ROOT_PATH, 'test');
+        $finder = new NamespaceViewFinder($ROOT_PATH, 'test');
 
         eq(
-            invoke($service, 'findTemplate', array($view, $TYPE)),
+            $finder->findTemplate($view, $TYPE),
             $ROOT_PATH . DIRECTORY_SEPARATOR
             . 'MockNamespacedViewModel'
             . '.' . $TYPE . '.php',
             'correctly resolves path to namespaced view-model'
         );
+
+        $finder = new NamespaceViewFinder(__DIR__, 'fudge');
+
+        expect(
+            'RuntimeException',
+            'unsupported view-model',
+            function () use ($finder, $view) {
+                $finder->findTemplate($view, 'view');
+            }
+        );
+
     }
 );
 
@@ -77,7 +89,7 @@ test(
     function () {
         $EXPECTED_CONTENT = 'something_or_other';
 
-        $service = new ViewService(__DIR__);
+        $service = new ViewService(new NamespaceViewFinder(__DIR__));
         $view = new MockViewModel();
 
         $service->begin($view->value);
@@ -93,7 +105,7 @@ test(
     function () {
         $view = new MockViewModel();
 
-        $service = new ViewService(__DIR__);
+        $service = new ViewService(new NamespaceViewFinder(__DIR__));
 
         expect(
             'RuntimeException',
@@ -103,7 +115,7 @@ test(
             }
         );
 
-        $service = new ViewService(__DIR__);
+        $service = new ViewService(new NamespaceViewFinder(__DIR__));
 
         expect(
             'RuntimeException',
@@ -113,7 +125,7 @@ test(
             }
         );
 
-        $service = new ViewService(__DIR__);
+        $service = new ViewService(new NamespaceViewFinder(__DIR__));
 
         $foo = '';
         $bar = '';
@@ -126,18 +138,6 @@ test(
             'end() with mismatched begin()',
             function () use ($service) {
                 $service->end($foo);
-            }
-        );
-
-        $service = new ViewService(__DIR__, 'fudge');
-
-        $model = new test\MockNamespacedViewModel();
-
-        expect(
-            'RuntimeException',
-            'unsupported view-model',
-            function () use ($service, $model) {
-                invoke($service, 'findTemplate', array($model, 'view'));
             }
         );
     }
