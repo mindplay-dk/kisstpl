@@ -26,7 +26,7 @@ class SimpleViewFinder implements ViewFinder
      */
     public function __construct($root_path, $namespace = null)
     {
-        $this->root_path = rtrim($root_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $this->root_path = rtrim($root_path, DIRECTORY_SEPARATOR);
         $this->namespace = $namespace;
     }
 
@@ -37,7 +37,7 @@ class SimpleViewFinder implements ViewFinder
      */
     public function findTemplate($view_model, $type)
     {
-        return $this->root_path . $this->getTemplateName($view_model) . ".{$type}.php";
+        return $this->root_path . DIRECTORY_SEPARATOR . $this->getTemplateName($view_model) . ".{$type}.php";
     }
 
     /**

@@ -11,7 +11,7 @@ if (coverage()) {
 
     // whitelist the files to cover:
 
-    $filter->addFileToWhitelist($root . '/src/ViewService.php');
+    $filter->addDirectoryToWhitelist($root . '/src');
 
     // begin code coverage:
 
@@ -41,11 +41,15 @@ test(
         $content = $service->capture($view, 'closure');
 
         eq($content, MockViewModel::EXPECTED_VALUE, 'template content from a closure was captured');
+
+        $content = $service->capture($view, 'closure');
+
+        eq($content, MockViewModel::EXPECTED_VALUE, 'template content from a cached closure was captured');
     }
 );
 
 test(
-    'Can find view templates (NamespaceViewFinder)',
+    'Can find view templates (SimpleViewFinder)',
     function () {
         $ROOT_PATH = 'foo/bar';
         $TYPE = 'baz';
@@ -101,6 +105,14 @@ test(
             $path = file_exists($finder->findTemplate($view, 'view'));
 
             ok($path, 'finds template from paths (' . implode(', ', $path_list) . ')', $path);
+
+            expect(
+                'RuntimeException',
+                'no view found',
+                function () use ($finder, $view) {
+                    $finder->findTemplate($view, 'fudge');
+                }
+            );
         }
     }
 );

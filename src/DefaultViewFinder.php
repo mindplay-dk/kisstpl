@@ -44,6 +44,16 @@ class DefaultViewFinder implements ViewFinder
 
         $name = get_class($view_model);
 
-        throw new RuntimeException("no view found for view-model: {$name}");
+        $paths = implode(
+            ', ',
+            array_map(
+                function (SimpleViewFinder $finder) {
+                    return $finder->root_path;
+                },
+                $this->finders
+            )
+        );
+
+        throw new RuntimeException("no view found for view-model: {$name} (searched paths: {$paths})");
     }
 }
