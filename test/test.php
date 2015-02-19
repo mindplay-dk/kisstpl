@@ -1,6 +1,7 @@
 <?php
 
-use mindplay\kisstpl\NamespaceViewFinder;
+use mindplay\kisstpl\DefaultViewFinder;
+use mindplay\kisstpl\SimpleViewFinder;
 use mindplay\kisstpl\ViewService;
 
 require __DIR__ . '/header.php';
@@ -20,7 +21,7 @@ if (coverage()) {
 test(
     'Can render views',
     function () {
-        $service = new ViewService(new NamespaceViewFinder(__DIR__));
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
         $view = new MockViewModel();
 
         ob_start();
@@ -49,7 +50,7 @@ test(
         $ROOT_PATH = 'foo/bar';
         $TYPE = 'baz';
 
-        $finder = new NamespaceViewFinder($ROOT_PATH);
+        $finder = new SimpleViewFinder($ROOT_PATH);
 
         $view = new \test\MockNamespacedViewModel();
 
@@ -61,7 +62,7 @@ test(
             'correctly resolves path to namespaced view-model'
         );
 
-        $finder = new NamespaceViewFinder($ROOT_PATH, 'test');
+        $finder = new SimpleViewFinder($ROOT_PATH, 'test');
 
         eq(
             $finder->findTemplate($view, $TYPE),
@@ -71,7 +72,7 @@ test(
             'correctly resolves path to namespaced view-model'
         );
 
-        $finder = new NamespaceViewFinder(__DIR__, 'fudge');
+        $finder = new SimpleViewFinder(__DIR__, 'fudge');
 
         expect(
             'RuntimeException',
@@ -80,7 +81,27 @@ test(
                 $finder->findTemplate($view, 'view');
             }
         );
+    }
+);
 
+test(
+    'can find view-templates (DefaultViewFinder)',
+    function () {
+        $path_lists = array(
+            array(__DIR__),
+            array('fudge', __DIR__),
+            array(__DIR__, 'fudge'),
+        );
+
+        $view = new MockViewModel();
+
+        foreach ($path_lists as $path_list) {
+            $finder = new DefaultViewFinder($path_list);
+
+            $path = file_exists($finder->findTemplate($view, 'view'));
+
+            ok($path, 'finds template from paths (' . implode(', ', $path_list) . ')', $path);
+        }
     }
 );
 
@@ -89,7 +110,7 @@ test(
     function () {
         $EXPECTED_CONTENT = 'something_or_other';
 
-        $service = new ViewService(new NamespaceViewFinder(__DIR__));
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
         $view = new MockViewModel();
 
         $service->begin($view->value);
@@ -105,7 +126,7 @@ test(
     function () {
         $view = new MockViewModel();
 
-        $service = new ViewService(new NamespaceViewFinder(__DIR__));
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
 
         expect(
             'RuntimeException',
@@ -115,7 +136,7 @@ test(
             }
         );
 
-        $service = new ViewService(new NamespaceViewFinder(__DIR__));
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
 
         expect(
             'RuntimeException',
@@ -125,7 +146,7 @@ test(
             }
         );
 
-        $service = new ViewService(new NamespaceViewFinder(__DIR__));
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
 
         $foo = '';
         $bar = '';

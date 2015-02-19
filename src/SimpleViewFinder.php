@@ -5,9 +5,10 @@ namespace mindplay\kisstpl;
 use RuntimeException;
 
 /**
- * Default view-finder implementation
+ * Simple view-finder implementation - maps a namespace directly to a root path
+ * and assumes that the template exists.
  */
-class NamespaceViewFinder implements ViewFinder
+class SimpleViewFinder implements ViewFinder
 {
     /**
      * @var string absolute path to the view root-folder for the base namespace
@@ -15,13 +16,13 @@ class NamespaceViewFinder implements ViewFinder
     public $root_path;
 
     /**
-     * @var string|null base namespace for view-models supported by this service
+     * @var string|null base namespace for view-models supported by this finder
      */
     public $namespace = null;
 
     /**
      * @param string      $root_path absolute path to view root-folder
-     * @param string|null $namespace optional; base namespace for view-models supported by this factory
+     * @param string|null $namespace optional; base namespace for view-models supported by this finder
      */
     public function __construct($root_path, $namespace = null)
     {

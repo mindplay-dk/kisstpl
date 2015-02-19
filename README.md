@@ -15,7 +15,7 @@ view-dictionaries (arrays) as are typical in most PHP template engines.
 The view-service is tied to a root folder and a root namespace:
 
 ```PHP
-$service = new ViewService('my/app/views', 'app\view');
+$service = new ViewService(new SimpleViewFinder('my/app/views', 'app\view'));
 
 $hello = new \app\view\HelloWorld();
 
@@ -24,7 +24,8 @@ $service->render($hello); // -> "my/app/views/HelloWorld.view.php"
 
 The `render()` statement in this example will render the template
 `my/app/views/HelloWorld.view.php`, passing the view-model object to
-the rendered template as `$view`.
+the rendered template as `$view` - the `SimpleViewFinder` is responsible
+for locating the actual template based on the type of view-model.
 
 The `render()` method also accepts a second argument, allowing you to
 render different templates for the same view-model:
@@ -113,9 +114,11 @@ a second argument allowing you to render different views of the same view-model.
 
 You can of course also extend `ViewService` with custom functionality - an
 interface `Renderer` defines the four basic methods, `render()`, `capture()`,
-`begin()` and `end()` so you can type-hint and swap out implementations as
-needed.
+`begin()` and `end()` so you can type-hint and swap out implementations as needed.
 
-You can also override the protected methods `getTemplateName()` and
-`findTemplate()` if you need custom logic (such as "themes") specific to
-your project.
+You can also replace the `ViewFinder` implementation if you need custom logic
+(specific to your project) for locating templates. Two implementations are
+included: `SimpleViewFinder` for direct 1:1 class/template-mappings (with no
+overhead from calls to `file_exists()`) and `DefaultViewFinder` which searches
+a list of root-paths and defaults to the first template found - the latter is
+useful in modular scenarios, e.g. using a "theme" folder for template overrides.
