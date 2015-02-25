@@ -78,13 +78,8 @@ test(
 
         $finder = new SimpleViewFinder(__DIR__, 'fudge');
 
-        expect(
-            'RuntimeException',
-            'unsupported view-model',
-            function () use ($finder, $view) {
-                $finder->findTemplate($view, 'view');
-            }
-        );
+        ok($finder->findTemplate($view, 'view') === null, 'resolves as NULL for unsupported namespace');
+        eq($finder->listSearchPaths($view, 'view'), array(), 'returns an empty list of search paths');
     }
 );
 
@@ -106,13 +101,7 @@ test(
 
             ok($path, 'finds template from paths (' . implode(', ', $path_list) . ')', $path);
 
-            expect(
-                'RuntimeException',
-                'no view found',
-                function () use ($finder, $view) {
-                    $finder->findTemplate($view, 'fudge');
-                }
-            );
+            eq($finder->findTemplate($view, 'fudge'), null, 'returns NULL if unresolved');
         }
     }
 );
@@ -137,6 +126,16 @@ test(
     'Throws expected Exceptions',
     function () {
         $view = new MockViewModel();
+
+        $service = new ViewService(new DefaultviewFinder(array('fudge')));
+
+        expect(
+            'RuntimeException',
+            'Template not found',
+            function () use ($view, $service) {
+                $service->render($view);
+            }
+        );
 
         $service = new ViewService(new SimpleViewFinder(__DIR__));
 

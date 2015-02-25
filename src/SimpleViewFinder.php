@@ -37,15 +37,21 @@ class SimpleViewFinder implements ViewFinder
      */
     public function findTemplate($view_model, $type)
     {
-        return $this->root_path . DIRECTORY_SEPARATOR . $this->getTemplateName($view_model) . ".{$type}.php";
+        $name = $this->getTemplateName($view_model);
+
+        return $name
+            ? $this->root_path . DIRECTORY_SEPARATOR . $name . ".{$type}.php"
+            : null;
     }
 
     /**
      * @param object $view_model view-model
      *
-     * @return string template name (e.g. "Bar/Baz" for class Foo\Bar\Baz if $namespace is 'Foo')
+     * @return string|null template name (e.g. "Bar/Baz" for class Foo\Bar\Baz if $namespace is 'Foo')
      *
      * @throws RuntimeException if the given view-model doesn't belong to the base namespace
+     *
+     * @see ViewFinder::findTemplate()
      */
     protected function getTemplateName($view_model)
     {
@@ -56,12 +62,22 @@ class SimpleViewFinder implements ViewFinder
             $length = strlen($prefix);
 
             if (strncmp($name, $prefix, $length) !== 0) {
-                throw new RuntimeException("unsupported view-model: {$name} - expected namespace: {$this->namespace}");
+                return null;
             }
 
             $name = substr($name, $length); // trim namespace prefix from class-name
         }
 
         return strtr($name, '\\', '/');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see ViewFinder::listSearchPaths()
+     */
+    public function listSearchPaths($view_model, $type)
+    {
+        return array_filter(array($this->findTemplate($view_model, $type)));
     }
 }

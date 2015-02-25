@@ -37,23 +37,27 @@ class DefaultViewFinder implements ViewFinder
         foreach ($this->finders as $finder) {
             $path = $finder->findTemplate($view_model, $type);
 
-            if (file_exists($path)) {
+            if ($path !== null && file_exists($path)) {
                 return $path;
             }
         }
 
-        $name = get_class($view_model);
+        return null;
+    }
 
-        $paths = implode(
-            ', ',
-            array_map(
-                function (SimpleViewFinder $finder) {
-                    return $finder->root_path;
-                },
-                $this->finders
-            )
-        );
+    /**
+     * {@inheritdoc}
+     *
+     * @see ViewFinder::listSearchPaths()
+     */
+    public function listSearchPaths($view_model, $type)
+    {
+        $paths = array();
 
-        throw new RuntimeException("no view found for view-model: {$name} (searched paths: {$paths})");
+        foreach ($this->finders as $finder) {
+            $paths[] = $finder->findTemplate($view_model, $type);
+        }
+
+        return array_filter($paths);
     }
 }

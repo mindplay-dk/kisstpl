@@ -70,6 +70,10 @@ class ViewService implements Renderer
 
         $__path = $this->finder->findTemplate($view, $__type);
 
+        if ($__path === null) {
+            $this->onMissingView($view, $__type); return;
+        }
+
         $__depth = count($this->capture_stack);
 
         $__class = get_class($view);
@@ -121,6 +125,8 @@ class ViewService implements Renderer
     /**
      * @param string &$var target variable reference for captured content
      *
+     * @return void
+     *
      * @see end()
      */
     public function begin(&$var)
@@ -133,6 +139,8 @@ class ViewService implements Renderer
 
     /**
      * @param string &$var target variable reference for captured content
+     *
+     * @return void
      *
      * @throws RuntimeException
      *
@@ -155,5 +163,28 @@ class ViewService implements Renderer
 
         // remove target variable reference from stack:
         array_pop($this->capture_stack);
+    }
+
+    /**
+     * Called internally, if a view could not be resolved
+     *
+     * @param object      $view the view-model attempted to render
+     * @param string|null $type the type of view attempted to render (optional)
+     *
+     * @return void
+     *
+     * @see render()
+     */
+    protected function onMissingView($view, $type)
+    {
+        $class = get_class($view);
+
+        $paths = $this->finder->listSearchPaths($view, $type);
+
+        $message = count($paths) > 0
+            ? "searched paths:\n  * " . implode("\n  * ", $paths)
+            : "no applicable path(s) found";
+
+        throw new RuntimeException("no view of type \"{$type}\" found for model: {$class} - {$message}");
     }
 }
