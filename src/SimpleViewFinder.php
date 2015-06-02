@@ -45,6 +45,16 @@ class SimpleViewFinder implements ViewFinder
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @see ViewFinder::listSearchPaths()
+     */
+    public function listSearchPaths($view_model, $type)
+    {
+        return array_filter(array($this->findTemplate($view_model, $type)));
+    }
+
+    /**
      * @param object $view_model view-model
      *
      * @return string|null template name (e.g. "Bar/Baz" for class Foo\Bar\Baz if $namespace is 'Foo')
@@ -69,15 +79,5 @@ class SimpleViewFinder implements ViewFinder
         }
 
         return strtr($name, '\\', '/');
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see ViewFinder::listSearchPaths()
-     */
-    public function listSearchPaths($view_model, $type)
-    {
-        return array_filter(array($this->findTemplate($view_model, $type)));
     }
 }

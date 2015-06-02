@@ -117,8 +117,18 @@ interface `Renderer` defines the four basic methods, `render()`, `capture()`,
 `begin()` and `end()` so you can type-hint and swap out implementations as needed.
 
 You can also replace the `ViewFinder` implementation if you need custom logic
-(specific to your project) for locating templates. Two implementations are
-included: `SimpleViewFinder` for direct 1:1 class/template-mappings (with no
-overhead from calls to `file_exists()`) and `DefaultViewFinder` which searches
-a list of root-paths and defaults to the first template found - the latter is
-useful in modular scenarios, e.g. using a "theme" folder for template overrides.
+(specific to your project) for locating templates. A few implementations are
+included:
+
+  * `SimpleViewFinder` for direct 1:1 class-to-file mapping (and zero overhead
+    from calls to `file_exists()`.)
+     
+  * `DefaultViewFinder` which searches a list of root-paths and defaults to
+    the first template found.
+
+  * `MultiViewFinder` which allows you to aggregate as many other `ViewFinder`
+    instances as you need, and try them in order.
+
+The latter is useful in modular scenarios, e.g. using a "theme" folder for
+template overrides, allowing you to plug in as many conventions for locating
+views as necessary.
