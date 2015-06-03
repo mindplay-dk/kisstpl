@@ -24,7 +24,7 @@ class LocalViewFinder implements ViewFinder
 
         $path = dirname($class->getFileName());
 
-        $name = $class->getName();
+        $name = $class->getShortName();
 
         return $path . DIRECTORY_SEPARATOR . $name . ".{$type}.php";
     }
