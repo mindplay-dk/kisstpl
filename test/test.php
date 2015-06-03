@@ -1,6 +1,8 @@
 <?php
 
 use mindplay\kisstpl\DefaultViewFinder;
+use mindplay\kisstpl\LocalViewFinder;
+use mindplay\kisstpl\MultiViewFinder;
 use mindplay\kisstpl\SimpleViewFinder;
 use mindplay\kisstpl\ViewService;
 
@@ -103,6 +105,36 @@ test(
 
             eq($finder->findTemplate($view, 'fudge'), null, 'returns NULL if unresolved');
         }
+    }
+);
+
+test(
+    'can find local view-template',
+    function () {
+        $finder = new LocalViewFinder();
+
+        $model = new MockViewModel();
+
+        $path = $finder->findTemplate($model, 'view');
+
+        $expected_path = __DIR__ . DIRECTORY_SEPARATOR . 'MockViewModel.view.php';
+
+        eq($finder->listSearchPaths($model, 'view'), array($expected_path), 'should list expected path');
+
+        eq($path, $expected_path, 'should find local view-template');
+
+        $multi = new MultiViewFinder();
+        $multi->addViewFinder($finder);
+        $service = new ViewService($multi);
+
+        expect(
+            'RuntimeException',
+            'should throw on missing template',
+            function () use ($service) {
+                // this will fail because no local view-file exists for this view-model:
+                $service->capture(new \test\MockNamespacedViewModel());
+            }
+        );
     }
 );
 

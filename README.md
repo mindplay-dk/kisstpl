@@ -121,8 +121,12 @@ You can also replace the `ViewFinder` implementation if you need custom logic
 included:
 
   * `SimpleViewFinder` for direct 1:1 class-to-file mapping (and zero overhead
-    from calls to `file_exists()`.)
-     
+    from calls to `file_exists()`) with a specified base namespace and root path.
+    
+  * `LocalViewFinder` for direct 1:1 class-to-file mapping (and zero overhead)
+    not limited to any particular namespace, and assuming local view-files located
+    in the same path as the view-model class file. 
+
   * `DefaultViewFinder` which searches a list of root-paths and defaults to
     the first template found.
 
