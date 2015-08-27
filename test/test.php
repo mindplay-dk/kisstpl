@@ -144,13 +144,14 @@ test(
         $EXPECTED_CONTENT = 'something_or_other';
 
         $service = new ViewService(new SimpleViewFinder(__DIR__));
-        $view = new MockViewModel();
 
-        $service->begin($view->value);
+        $var = null;
+
+        $service->begin($var);
         echo $EXPECTED_CONTENT;
-        $service->end($view->value);
+        $service->end($var);
 
-        eq($view->value, $EXPECTED_CONTENT, 'content was captured');
+        eq($var, $EXPECTED_CONTENT, 'content was captured');
     }
 );
 
@@ -191,8 +192,8 @@ test(
 
         $service = new ViewService(new SimpleViewFinder(__DIR__));
 
-        $foo = '';
-        $bar = '';
+        $foo = null;
+        $bar = null;
 
         $service->begin($foo);
         $service->begin($bar);
@@ -200,8 +201,21 @@ test(
         expect(
             'RuntimeException',
             'end() with mismatched begin()',
-            function () use ($service) {
+            function () use ($service, &$foo) {
                 $service->end($foo);
+            }
+        );
+
+        $service->end($bar);
+        $service->end($foo);
+
+        $service->begin($foo);
+
+        expect(
+            'RuntimeException',
+            'begin() with same reference as prior begin()',
+            function () use ($service, &$foo) {
+                $service->begin($foo);
             }
         );
     }

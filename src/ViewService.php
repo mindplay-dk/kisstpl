@@ -31,6 +31,14 @@ class ViewService implements Renderer
     protected $capture_stack = array();
 
     /**
+     * @var int a unique index to track use of the capture stack
+     *
+     * @see begin()
+     * @see end()
+     */
+    private $capture_index = 0;
+
+    /**
      * @var Closure[] map where view-model class name => cached view closure
      */
     private $cache = array();
@@ -131,6 +139,14 @@ class ViewService implements Renderer
      */
     public function begin(&$var)
     {
+        $index = $this->capture_index++;
+        
+        $var = __CLASS__ . "::\$capture_stack[{$index}]";
+
+        if (in_array($var, $this->capture_stack, true)) {
+            throw new RuntimeException("begin() with same reference as prior begin()");
+        }
+
         $this->capture_stack[] = &$var;
 
         // begin buffering content to capture:
