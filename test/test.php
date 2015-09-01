@@ -209,6 +209,27 @@ test(
     }
 );
 
+test(
+    'internally calls onMissingView()',
+    function () {
+        $ROOT_PATH = '/foo/bar';
+        $VIEW_TYPE = "baz";
+
+        $finder = new SimpleViewFinder($ROOT_PATH, 'test');
+
+        $view = new MockViewModel();
+
+        eq($finder->findTemplate($view, $VIEW_TYPE), null, "precondition: view-finder can NOT find a template");
+
+        $service = new MockViewService($finder);
+
+        $service->capture($view, $VIEW_TYPE);
+
+        eq($service->missed_view, $view);
+        eq($service->missed_type, $VIEW_TYPE);
+    }
+);
+
 configure()->enableCodeCoverage(dirname(__DIR__) . '/build/logs/clover.xml', $root . '/src');
 
 exit(run());

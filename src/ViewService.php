@@ -39,9 +39,14 @@ class ViewService implements Renderer
     private $capture_index = 0;
 
     /**
-     * @var Closure[] map where view-model class name => cached view closure
+     * @var string[][] map where view-model class name => map where view type => view path
      */
-    private $cache = array();
+    private $path_cache = array();
+
+    /**
+     * @var Closure[] map where view path => view Closure
+     */
+    private $closure_cache = array();
 
     /**
      * @param ViewFinder $finder
@@ -76,31 +81,19 @@ class ViewService implements Renderer
 
         unset($type);
 
-        $__path = $this->finder->findTemplate($view, $__type);
+        $__class = get_class($view);
+
+        $__path = @$this->path_cache[$__class][$__type] ?: $this->finder->findTemplate($view, $__type);
 
         if ($__path === null) {
-            $this->onMissingView($view, $__type); return;
+            $this->onMissingView($view, $__type);
+
+            return;
         }
 
         $__depth = count($this->capture_stack);
 
-        $__class = get_class($view);
-
-        if (isset($this->cache[$__class][$__type])) {
-            // invoke closure cached during previous call:
-
-            call_user_func($this->cache[$__class][$__type], $view, $this);
-        } else {
-            $__closure = require $__path;
-
-            if (is_callable($__closure)) {
-                // inject closure into cache and invoke:
-
-                $this->cache[$__class][$__type] = $__closure;
-
-                call_user_func($__closure, $view, $this);
-            }
-        }
+        $this->renderFile($__path, $view);
 
         if (count($this->capture_stack) !== $__depth) {
             throw new RuntimeException('begin() without matching end() in file: ' . $__path);
@@ -140,7 +133,7 @@ class ViewService implements Renderer
     public function begin(&$var)
     {
         $index = $this->capture_index++;
-        
+
         $var = __CLASS__ . "::\$capture_stack[{$index}]";
 
         if (in_array($var, $this->capture_stack, true)) {
@@ -179,6 +172,42 @@ class ViewService implements Renderer
 
         // remove target variable reference from stack:
         array_pop($this->capture_stack);
+    }
+
+    /**
+     * Internally render a template file (or delegate to a cached closure)
+     *
+     * @param string $_path_ absolute path to PHP template
+     * @param object $view the view-model to render
+     *
+     * @return void
+     */
+    protected function renderFile($_path_, $view)
+    {
+        if (!isset($this->closure_cache[$_path_])) {
+            $_closure_ = require $_path_;
+
+            if (is_callable($_closure_)) {
+                $this->closure_cache[$_path_] = $_closure_;
+            }
+        }
+
+        if (isset($this->closure_cache[$_path_])) {
+            $this->renderClosure($this->closure_cache[$_path_], $view);
+        }
+    }
+
+    /**
+     * Internally render a template closure
+     *
+     * @param Closure $closure template closure
+     * @param object  $view    the view-model to render
+     *
+     * @return void
+     */
+    protected function renderClosure($closure, $view)
+    {
+        call_user_func($closure, $view, $this);
     }
 
     /**
