@@ -14,6 +14,7 @@
     },
     "require-dev": {
         "phpunit/php-code-coverage": "2.*",
+        "mindplay/testies": "dev-master",
         "mindplay/benchpress": "@dev"
     },
     "autoload": {

@@ -8,18 +8,6 @@ use mindplay\kisstpl\ViewService;
 
 require __DIR__ . '/header.php';
 
-if (coverage()) {
-    $filter = coverage()->filter();
-
-    // whitelist the files to cover:
-
-    $filter->addDirectoryToWhitelist($root . '/src');
-
-    // begin code coverage:
-
-    coverage()->start('test');
-}
-
 test(
     'Can render views',
     function () {
@@ -221,22 +209,6 @@ test(
     }
 );
 
-if (coverage()) {
-    // end code coverage:
+configure()->enableCodeCoverage(dirname(__DIR__) . '/build/logs/clover.xml', $root . '/src');
 
-    coverage()->stop();
-
-    // output code coverage report to console:
-
-    $report = new PHP_CodeCoverage_Report_Text(10, 90, false, false);
-
-    echo $report->process(coverage(), false);
-
-    // output code coverage report for integration with CI tools:
-
-    $report = new PHP_CodeCoverage_Report_Clover();
-
-    $report->process(coverage(), $root . '/build/logs/clover.xml');
-}
-
-exit(status());
+exit(run());
