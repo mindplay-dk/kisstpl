@@ -50,9 +50,9 @@ class MultiViewFinder implements ViewFinder
         $paths = array();
 
         foreach ($this->finders as $finder) {
-            $paths[] = $finder->findTemplate($view_model, $type);
+            $paths = array_merge($paths, $finder->listSearchPaths($view_model, $type));
         }
 
-        return array_filter($paths);
+        return $paths;
     }
 }

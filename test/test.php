@@ -115,6 +115,8 @@ test(
         $multi->addViewFinder($finder);
         $service = new ViewService($multi);
 
+        eq($multi->listSearchPaths($model, 'view'), array($expected_path));
+
         expect(
             'RuntimeException',
             'should throw on missing template',
