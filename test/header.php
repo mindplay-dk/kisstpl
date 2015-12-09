@@ -8,3 +8,4 @@ require __DIR__ . '/MockLayout.php';
 require __DIR__ . '/MockViewModel.php';
 require __DIR__ . '/MockNamespacedViewModel.php';
 require __DIR__ . '/MockViewService.php';
+require __DIR__ . '/MockViewFinder.php';

@@ -103,12 +103,10 @@ test(
 
         $model = new MockViewModel();
 
-        $path = $finder->findTemplate($model, 'view');
-
         $expected_path = __DIR__ . DIRECTORY_SEPARATOR . 'MockViewModel.view.php';
-
         eq($finder->listSearchPaths($model, 'view'), array($expected_path), 'should list expected path');
 
+        $path = $finder->findTemplate($model, 'view');
         eq($path, $expected_path, 'should find local view-template');
 
         $multi = new MultiViewFinder();
@@ -125,6 +123,27 @@ test(
                 $service->capture(new \test\MockNamespacedViewModel());
             }
         );
+
+        $multi->addViewFinder(new MockViewFinder("foo"));
+
+        // same conditions as before, because adding the view-finder should cause it to have lower priority:
+
+        eq($finder->listSearchPaths($model, 'view'), array($expected_path), 'should still list expected path');
+        eq($path, $expected_path, 'should still find local view-template');
+
+        $multi->pushViewFinder(new MockViewFinder("bar"));
+
+        eq(
+            $multi->listSearchPaths($model, 'view'),
+            array(
+                "bar", // least priority (pushed last)
+                $expected_path,
+                "foo", // least priority (added last)
+            ),
+            'view-finders provide search paths with expected priority'
+        );
+
+        eq($path, $expected_path, 'pushed view-finder determines the result');
     }
 );
 
