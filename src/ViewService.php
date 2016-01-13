@@ -83,7 +83,11 @@ class ViewService implements Renderer
 
         $__class = get_class($view);
 
-        $__path = @$this->path_cache[$__class][$__type] ?: $this->finder->findTemplate($view, $__type);
+        if (! isset($this->path_cache[$__class][$__type])) {
+            $this->path_cache[$__class][$__type] = $this->finder->findTemplate($view, $__type);
+        }
+
+        $__path = $this->path_cache[$__class][$__type];
 
         if ($__path === null) {
             $this->onMissingView($view, $__type);

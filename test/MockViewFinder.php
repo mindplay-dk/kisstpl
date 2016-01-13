@@ -9,6 +9,11 @@ class MockViewFinder implements ViewFinder
 {
     private $mock_path;
 
+    /**
+     * @var int number of times findTemplate() was called
+     */
+    public $called = 0;
+
     public function __construct($mock_path)
     {
         $this->mock_path = $mock_path;
@@ -16,6 +21,8 @@ class MockViewFinder implements ViewFinder
 
     public function findTemplate($view_model, $type)
     {
+        $this->called += 1;
+
         return $this->mock_path;
     }
 

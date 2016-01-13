@@ -31,10 +31,25 @@ test(
         $content = $service->capture($view, 'closure');
 
         eq($content, MockViewModel::EXPECTED_VALUE, 'template content from a closure was captured');
+    }
+);
 
-        $content = $service->capture($view, 'closure');
+test(
+    'Can cache template paths',
+    function () {
+        $finder = new MockViewFinder(__DIR__ . '/MockViewModel.view.php');
 
-        eq($content, MockViewModel::EXPECTED_VALUE, 'template content from a cached closure was captured');
+        $service = new ViewService($finder);
+
+        $view = new MockViewModel();
+
+        $service->capture($view);
+
+        eq($finder->called, 1);
+
+        $service->capture($view);
+
+        eq($finder->called, 1, 'findTemplate() gets called only the first time');
     }
 );
 
