@@ -1,10 +1,9 @@
 mindplay/kisstpl
 ----------------
 
+[![PHP Version](https://img.shields.io/badge/php-5.3%2B-blue.svg)](https://packagist.org/packages/mindplay/kisstpl)
 [![Build Status](https://travis-ci.org/mindplay-dk/kisstpl.svg?branch=master)](https://travis-ci.org/mindplay-dk/kisstpl)
-
 [![Code Coverage](https://scrutinizer-ci.com/g/mindplay-dk/kisstpl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mindplay-dk/kisstpl/?branch=master)
-
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mindplay-dk/kisstpl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mindplay-dk/kisstpl/?branch=master)
 
 A very simple view-service / template-engine for plain PHP templates.
