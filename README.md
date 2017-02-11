@@ -11,6 +11,8 @@ A very simple view-service / template-engine for plain PHP templates.
 I wanted a template engine that uses view-models (objects) rather than
 view-dictionaries (arrays) as are typical in most PHP template engines.
 
+Oh, and if you don't like typing `htmlspecialchars()` all day, maybe try [this](https://github.com/mindplay-dk/escape).
+
 The view-service is tied to a root folder and a root namespace:
 
 ```PHP
