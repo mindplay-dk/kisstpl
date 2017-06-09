@@ -219,6 +219,19 @@ test(
 
         eq(ob_get_level(), $ob_level, "should clean up hanging output buffers");
 
+        $ob_level = ob_get_level();
+
+        expect(
+            'RuntimeException',
+            'No matching call to end()',
+            function () use ($view, $service) {
+                $service->render($view, 'ob_start');
+            },
+            "/output buffer-level mismatch/"
+        );
+
+        eq(ob_get_level(), $ob_level, "should clean up hanging output buffers");
+
         $service = new ViewService(new SimpleViewFinder(__DIR__));
 
         $foo = null;
