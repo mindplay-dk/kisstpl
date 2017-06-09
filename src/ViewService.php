@@ -97,10 +97,20 @@ class ViewService implements Renderer
 
         $__depth = count($this->capture_stack);
 
+        $ob_level = ob_get_level();
+
         $this->renderFile($__path, $view);
 
-        if (count($this->capture_stack) !== $__depth) {
-            throw new RuntimeException('begin() without matching end() in file: ' . $__path);
+        if (ob_get_level() !== $ob_level) {
+            $error = count($this->capture_stack) !== $__depth
+                ? "begin() without matching end()"
+                : "output buffer-level mismatch: was " . ob_get_level() . ", expected {$ob_level}";
+
+            while (ob_get_level() > $ob_level) {
+                ob_end_clean(); // clean up any hanging output buffers prior to throwing
+            }
+
+            throw new RuntimeException("{$error} in file: {$__path}");
         }
     }
 

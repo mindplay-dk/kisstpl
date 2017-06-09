@@ -206,13 +206,18 @@ test(
 
         $service = new ViewService(new SimpleViewFinder(__DIR__));
 
+        $ob_level = ob_get_level();
+
         expect(
             'RuntimeException',
             'No matching call to end()',
             function () use ($view, $service) {
                 $service->render($view, 'missing_end');
-            }
+            },
+            "/" . preg_quote("begin() without matching end() in file") . "/"
         );
+
+        eq(ob_get_level(), $ob_level, "should clean up hanging output buffers");
 
         $service = new ViewService(new SimpleViewFinder(__DIR__));
 
