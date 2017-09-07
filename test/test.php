@@ -284,6 +284,25 @@ test(
     }
 );
 
+test(
+    'maintains output-buffering level on error',
+    function () {
+        $view = new MockViewModel();
+
+        $service = new ViewService(new SimpleViewFinder(__DIR__));
+
+        $expected_level = ob_get_level();
+
+        try {
+            $service->capture($view, "failing");
+        } catch (RuntimeException $e) {
+            eq($e->getMessage(), "from template");
+        }
+
+        eq(ob_get_level(), $expected_level, "output-buffer gets cleaned up");
+    }
+);
+
 configure()->enableCodeCoverage(dirname(__DIR__) . '/build/logs/clover.xml', $root . '/src');
 
 exit(run());

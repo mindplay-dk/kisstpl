@@ -3,7 +3,9 @@
 namespace mindplay\kisstpl;
 
 use Closure;
+use http\Exception;
 use RuntimeException;
+use Throwable;
 
 /**
  * This service provides a view/template rendering service and a simple output capture facility.
@@ -132,9 +134,21 @@ class ViewService implements Renderer
     {
         ob_start();
 
-        $this->render($view, $type);
+        try {
+            $this->render($view, $type);
+        } catch (Exception $exception) {
+            // re-throwing below (PHP 5.3+)
+        } catch (Throwable $exception) {
+            // re-throwing below (PHP 7.0+)
+        }
 
-        return ob_get_clean();
+        $output = ob_get_clean();
+
+        if (isset($exception)) {
+            throw $exception;
+        }
+
+        return $output;
     }
 
     /**
