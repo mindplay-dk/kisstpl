@@ -3,7 +3,7 @@
 namespace mindplay\kisstpl;
 
 use Closure;
-use http\Exception;
+use Exception;
 use RuntimeException;
 use Throwable;
 
